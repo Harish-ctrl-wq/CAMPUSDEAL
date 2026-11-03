@@ -35,7 +35,7 @@ Students often need affordable books, laptops, bicycles, and gadgets but have li
 |---|---|
 | Frontend | React 18, Vite, Tailwind CSS, React Router, Lucide React, Fetch API |
 | Backend | Python 3.10+, FastAPI, Pydantic, SQLAlchemy 2, Pandas |
-| Database | SQLite |
+| Database | SQLite for local development; PostgreSQL (Neon) supported |
 | API | JSON REST endpoints; multipart file upload for imports |
 
 ```text
@@ -44,6 +44,8 @@ backend/
   database.py             SQLAlchemy engine and session dependency
   models.py               Product ORM model
   schemas.py              Request validation and response models
+  alembic.ini             Migration configuration (no credentials)
+  migrations/             Versioned schema migrations
   routes/                 Product, analytics, and recommendation APIs
   services/               Recommendation and anomaly calculations
   data/                   Supplied seed dataset as JSON
@@ -72,7 +74,9 @@ The `products` table contains:
 | `created_at` | DateTime | Listing timestamp |
 | `source_id` | String, nullable | Optional unique import ID used for duplicate detection |
 
-On startup, the backend creates `backend/campusdeal.db` if it does not exist and seeds it with the five supplied Laptop records only when the products table is empty. The source data is [`backend/data/sample_products.json`](backend/data/sample_products.json). A curated SQLite snapshot containing only P01–P05 is also provided as [`backend/campusdeal-demo.sqlite3`](backend/campusdeal-demo.sqlite3); it is for inspection/demo use, while the app uses `campusdeal.db` by default.
+`DATABASE_URL` selects the database. If it is unset, the backend uses `backend/campusdeal.db` with SQLite; SQLite tables are created at startup. Standard `postgresql://` and `postgres://` URLs select the synchronous `psycopg` driver. PostgreSQL connections use a small bounded SQLAlchemy pool with connection health checks and recycling; SSL mode defaults to `require` unless the URL specifies another mode.
+
+PostgreSQL schema changes are managed with Alembic rather than being created automatically at API startup. The initial migration creates the `products` table and its indexes; it does not drop tables, rewrite records, or copy data from SQLite. Its downgrade is intentionally blocked to avoid accidental deletion of listings. When the product table is empty, the existing startup behavior adds the five supplied Laptop records; it never replaces existing rows. The source data is [`backend/data/sample_products.json`](backend/data/sample_products.json). A curated SQLite snapshot containing only P01–P05 is also provided as [`backend/campusdeal-demo.sqlite3`](backend/campusdeal-demo.sqlite3); it is for inspection/demo use, while the app uses `campusdeal.db` by default.
 
 The sample data is:
 
@@ -155,6 +159,20 @@ python -m uvicorn main:app --reload
 
 Backend API: `http://localhost:8000`
 API documentation: `http://localhost:8000/docs`
+
+### Neon PostgreSQL configuration
+
+Set `DATABASE_URL` in the backend process environment to the Neon connection string from the Neon console. Keep the connection string in a deployment secret/environment setting; do not commit it or put it in source control. Use Neon's SSL-enabled URL (normally `sslmode=require`) and, for serverless deployments, prefer the Neon pooled connection endpoint. The app maps a standard PostgreSQL URL to `postgresql+psycopg` and applies bounded connection pooling.
+
+Before starting the API against a new PostgreSQL database, inspect the target database and apply the schema migration explicitly from the backend directory:
+
+```powershell
+cd backend
+$env:DATABASE_URL = "<Neon connection string>"
+python -m alembic upgrade head
+```
+
+Set the real value through your deployment provider's secret manager instead of saving it in a tracked file. This migration initializes the schema only; it does not transfer local SQLite listings. No PostgreSQL migration or deployment is performed by the ordinary development/test commands.
 
 ### Frontend
 

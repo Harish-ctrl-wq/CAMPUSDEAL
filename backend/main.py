@@ -14,7 +14,8 @@ SAMPLE_DATA = Path(__file__).resolve().parent / "data" / "sample_products.json"
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    Base.metadata.create_all(bind=engine)
+    if engine.dialect.name == "sqlite":
+        Base.metadata.create_all(bind=engine)
     with SessionLocal() as db:
         if db.query(Product).count() == 0:
             samples = json.loads(SAMPLE_DATA.read_text(encoding="utf-8"))
