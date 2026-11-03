@@ -1,0 +1,47 @@
+[
+  {
+    "source_id": "P01",
+    "title": "Laptop A",
+    "category": "Laptop",
+    "price": 22000,
+    "age": 2,
+    "condition": "Good",
+    "original_price": 45000
+  },
+  {
+    "source_id": "P02",
+    "title": "Laptop B",
+    "category": "Laptop",
+    "price": 18000,
+    "age": 3,
+    "condition": "Average",
+    "original_price": 42000
+  },
+  {
+    "source_id": "P03",
+    "title": "Laptop C",
+    "category": "Laptop",
+    "price": 25000,
+    "age": 1,
+    "condition": "Excellent",
+    "original_price": 48000
+  },
+  {
+    "source_id": "P04",
+    "title": "Laptop D",
+    "category": "Laptop",
+    "price": 20000,
+    "age": 2,
+    "condition": "Good",
+    "original_price": 40000
+  },
+  {
+    "source_id": "P05",
+    "title": "Laptop E",
+    "category": "Laptop",
+    "price": 15000,
+    "age": 4,
+    "condition": "Average",
+    "original_price": 38000
+  }
+]

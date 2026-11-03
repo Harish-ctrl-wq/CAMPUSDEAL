@@ -1,0 +1,43 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Local databases and SQLite sidecars; only the curated safe demo DB is publishable
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+!backend/campusdeal-demo.sqlite3
+
+# Python environments, bytecode, and test caches
+.venv/
+venv/
+**/.venv/
+**/venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+# JavaScript dependencies and generated output
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+
+# IDE, OS, logs, and local generated files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+
+# Accidental empty lockfile created at the workspace root; frontend lockfile is retained
+/package-lock.json
